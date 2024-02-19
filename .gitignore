@@ -1,3 +1,12 @@
+# user Defined
+*.db
+.env
+*.pdf
+*.json
+temp/*
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

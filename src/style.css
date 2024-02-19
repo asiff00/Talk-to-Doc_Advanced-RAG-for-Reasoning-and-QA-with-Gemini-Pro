@@ -1,0 +1,68 @@
+body {
+    background-color: #171717;
+    font-family: 'San Francisco', 'Helvetica Neue', sans-serif;
+    color: rgb(43, 51, 49)
+}
+
+#column_container {
+    max-width: 80%;
+    margin: auto;
+    background-color: #19273c80;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(108, 247, 242, 0.372);
+    padding: 40px;
+}
+
+h1 {
+    color: #58ffb1;
+    text-align: center;
+    font-family: 'Avenir Next', 'Helvetica Neue', sans-serif;
+    font-size: 3em;
+}
+
+h2 {
+    color: #ffffff;
+    text-align: center;
+    font-family: 'Avenir Next', 'Helvetica Neue', sans-serif;
+    font-size: 2em;
+}
+
+p,
+li {
+    color: #ffffff;
+    line-height: 1.6;
+    font-family: 'Georgia', serif;
+
+}
+
+strong {
+    color: #a3fdd3;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+li {
+    padding-left: 20px;
+    position: relative;
+}
+
+button {
+    background-color: #2b0808;
+    color: #ff0000;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 1px 3px rgba(255, 94, 94, 0.753);
+
+    button:hover {
+        background-color: #55a369;
+    }
+}

@@ -1,13 +1,7 @@
 ---
-title: Talk To Doc-Advanced Reasoning And QA With Gemini Pro
-emoji: 🦀
-colorFrom: green
-colorTo: green
-sdk: gradio
-sdk_version: 4.19.1
+title: Talk To Doc: Advanced RAG for Reasoning And QA With Gemini Pro
 app_file: app.py
-pinned: false
-license: apache-2.0
+license: mit
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+Check out the interactive demo at https://huggingface.co/spaces/asif00/Talk_to_Doc-Advanced_RAG_for_Reasoning_and_QA_with_Gemini_Pro

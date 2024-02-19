@@ -1,6 +1,6 @@
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Hugging%20Face-ff69b4.svg)]([https://huggingface.co/](https://huggingface.co/spaces/asif00/Talk_to_Doc-Advanced_RAG_for_Reasoning_and_QA_with_Gemini_Pro))
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Hugging%20Face-ff69b4.svg)](https://huggingface.co/spaces/asif00/Talk_to_Doc-Advanced_RAG_for_Reasoning_and_QA_with_Gemini_Pro)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![WIP](https://img.shields.io/badge/status-WIP-orange.svg)](https://github.com/your-username/your-repo/wiki/Roadmap)
+[![WIP](https://img.shields.io/badge/status-WIP-orange.svg)](https://github.com/himisir/Talk-to-Doc_Advanced-RAG-for-Reasoning-and-QA-with-Gemini-Pro)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
 [![Gemini Pro](https://img.shields.io/badge/Gemini%20Pro-green.svg)](https://ai.google.dev/)
 

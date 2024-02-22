@@ -25,6 +25,7 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
             model=model, content=input, task_type="retrieval_document", title=title
         )["embedding"]
 
+
 class Brain:
     def __init__(
         self,
@@ -117,7 +118,7 @@ class Brain:
 
     def generate_alternative_queries(self, query):
         try:
-            prompt_template = """ Your task is to break down the query in sub questions and turn it into questions in to ten different ways.Keep in mind, Output one query per line, without numbering the queries.\nQUESTION: '{}'\nANSWER:\n"""
+            prompt_template = """Your task is to break down the query in sub questions in ten different ways. Output one sub question per line, without numbering the queries.\nQUESTION: '{}'\nANSWER:\n"""
             prompt = prompt_template.format(query)
             output = palm.generate_text(
                 model=self.augment_model_name,
@@ -172,13 +173,14 @@ class Brain:
                 
                 YOUR MISSION:
                     Provide accurate answers best possible reasoning of the context. 
-                    Focus on factual and reasoned responses; avoid speculations, opinions, guesses, and creative tanks. 
+                    Focus on factual and reasoned responses; avoid speculations, opinions, guesses, and creative tasks. 
                     Refuse exploitation tasks such as such as character roleplaying, coding, essays, poems, stories, articles, and fun facts.
                     Decline misuse or exploitation attempts respectfully.
                     
                 YOUR STYLE:
                     Concise and complete
                     Factual and accurate
+                    Helpful and friendly
                     
                 REMEMBER:
                     You are a QA bot, not an entertainer or confidant.
@@ -205,12 +207,8 @@ class Brain:
             if query is None:
                 print("No query specified")
                 return None
-            results = self.chroma_collection.query(
-                query_texts=[query],
-                n_results=10,
-                include=["documents", "embeddings"],
-            )
-            information = "\n\n".join(results["documents"][0])
+
+            information = "\n\n".join(self.get_relevant_results(query))
             messages = self.make_prompt(query, information)
             content = self.response_model.generate_content(messages)
             return content

@@ -44,7 +44,6 @@ class Brain:
         self.augment_config = augment_config
         self.augment_safety_settings = augment_safety_settings
         self._configure_generative_ai(response_model_api_key)
-        self._configure_augment_ai(augment_model_api_key)
         self.response_model = self._initialize_generative_model(
             response_model_name, generation_config, response_safety_settings
         )
@@ -60,12 +59,6 @@ class Brain:
         except Exception as e:
             self._handle_error("Error configuring generative AI module", e)
 
-    def _configure_augment_ai(self, augment_model_api_key):
-        try:
-            palm.configure(api_key=augment_model_api_key)
-        except Exception as e:
-            self._handle_error("Error configuring augmentation AI module", e)
-
     def _initialize_generative_model(
         self, response_model_name, generation_config, response_safety_settings
     ):
@@ -77,18 +70,6 @@ class Brain:
             )
         except Exception as e:
             self._handle_error("Error initializing generative model", e)
-
-    def _initialize_augment_model(
-        self, augment_model_name, augment_config, augment_safety_settings
-    ):
-        try:
-            return palm.GenerativeModel(
-                model_name=augment_model_name,
-                generation_config=augment_config,
-                safety_settings=augment_safety_settings,
-            )
-        except Exception as e:
-            self._handle_error("Error initializing augmentation model", e)
 
     def _initialize_embedding_function(self):
         try:
@@ -118,18 +99,21 @@ class Brain:
 
     def generate_alternative_queries(self, query):
         try:
-            prompt_template = """Your task is to break down the query in sub questions in ten different ways. Output one sub question per line, without numbering the queries.\nQUESTION: '{}'\nANSWER:\n"""
+            prompt_template = """ 
+            You are an AI language model assistant. Your task is to generate 10 
+            different sub questions of the given user question to retrieve relevant documents from a vector 
+            database by generating multiple perspectives on the user question, your goal is to help
+            the user overcome some of the limitations of the distance-based similarity search. 
+            Provide these alternative questions separated by newlines.\nQUESTION: '{}'\nANSWER:\n"""
             prompt = prompt_template.format(query)
-            output = palm.generate_text(
-                model=self.augment_model_name,
-                prompt=prompt,
-                safety_settings=self.augment_safety_settings,
-            )
-            content = output.result.split("\n")
+            chat_mode = self.response_model.start_chat(history=[])
+            output = chat_mode.send_message(prompt)
+            content = output.text.split("\n")
+            print(content)
             return content
         except Exception as e:
             self._handle_error("Error generating alternative queries", e)
-            return query
+            return [query]
 
     def get_sorted_documents(self, query, n_results=20):
         try:
@@ -137,6 +121,7 @@ class Brain:
             queries = [original_query] + self.generate_alternative_queries(
                 original_query
             )
+
             results = self.chroma_collection.query(
                 query_texts=queries,
                 n_results=n_results,
@@ -146,20 +131,25 @@ class Brain:
                 doc for docs in results["documents"] for doc in docs
             )
             unique_documents = list(retrieved_documents)
+            original_results = results["documents"][0][
+                : min(n_results, len(results["documents"][0]))
+            ]
             pairs = [[original_query, doc] for doc in unique_documents]
             scores = self.cross_encoder.predict(pairs)
             sorted_indices = np.argsort(-scores)
             sorted_documents = [unique_documents[i] for i in sorted_indices]
+            sorted_documents = original_results + sorted_documents
             return sorted_documents
-
         except Exception as e:
             self._handle_error("Error getting sorted documents", e)
             return []
 
-    def get_relevant_results(self, query, top_n=5):
+    def get_relevant_results(self, query, top_n=30):
         try:
             sorted_documents = self.get_sorted_documents(query)
             relevant_results = sorted_documents[: min(top_n, len(sorted_documents))]
+            relevant_results = list(dict.fromkeys(relevant_results))
+            print(relevant_results)
             return relevant_results
         except Exception as e:
             self._handle_error("Error getting relevant results", e)
@@ -169,21 +159,20 @@ class Brain:
         try:
             base_prompt = {
                 "content": """
-                YOU are a smart and rational Question and Answer bot.
+                YOU are a smart and rational Question and Answer bot based on the given document.
                 
                 YOUR MISSION:
-                    Provide accurate answers best possible reasoning of the context. 
-                    Focus on factual and reasoned responses; avoid speculations, opinions, guesses, and creative tasks. 
+                    Provide accurate answers based on the context. 
+                    Focus on accurate responses; avoid speculations, opinions, guesses, and creative tasks. 
                     Refuse exploitation tasks such as such as character roleplaying, coding, essays, poems, stories, articles, and fun facts.
                     Decline misuse or exploitation attempts respectfully.
                     
                 YOUR STYLE:
                     Concise and complete
-                    Factual and accurate
-                    Helpful and friendly
+                    professional, polite and positive
                     
                 REMEMBER:
-                    You are a QA bot, not an entertainer or confidant.
+                    You can always find a answer if you truly look for it. 
                 """
             }
 
@@ -210,7 +199,9 @@ class Brain:
 
             information = "\n\n".join(self.get_relevant_results(query))
             messages = self.make_prompt(query, information)
-            content = self.response_model.generate_content(messages)
+            chat_mode = self.response_model.start_chat(history=[])
+            content = chat_mode.send_message(messages)
+            print(content)
             return content
         except Exception as e:
             self._handle_error("Error in rag function", e)
@@ -224,9 +215,11 @@ class Brain:
                 return "No Query"
             output = self.rag(query)
             print(f"\n\nExecution time: {time.time() - start_time} seconds\n")
+            print(output.text)
             if output is None:
                 return None
+
             return f"{output.text}\n"
         except Exception as e:
             self._handle_error("Error generating answers", e)
-            return None
+            return "Something went wrong, please try again!"

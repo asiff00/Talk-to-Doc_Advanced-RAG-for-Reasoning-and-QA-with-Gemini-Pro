@@ -13,7 +13,7 @@ def _read_pdf(filename):
 
 def _chunk_texts(texts):
     character_splitter = RecursiveCharacterTextSplitter(
-        separators=["\n\n", "\n", ". ", " ", ""], chunk_size=1600, chunk_overlap=200
+        separators=["\n\n", "\n", ". ", " ", ""], chunk_size=1200, chunk_overlap=200
     )
     character_split_texts = character_splitter.split_text("\n\n".join(texts))
     token_splitter = SentenceTransformersTokenTextSplitter(
